@@ -1,29 +1,10 @@
 import React, { useEffect, useState } from "react";
-
-const InitialForm = {
-  amount: "",
-  description: "",
-  date: "",
-};
+import AppBar from "./components/AppBar";
+import TransactionForm from "./components/TransactionForm";
+import TransactionsList from "./components/TransactionsList";
+import { Container } from "@mui/material";
 
 function App() {
-  const [form, setForm] = useState(InitialForm);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const res = await fetch("http://localhost:4000/transaction", {
-      method: "POST",
-      body: JSON.stringify(form),
-      headers: {
-        "content-type": "application/json",
-      },
-    });
-    if (res.ok) {
-      setForm(InitialForm);
-      fetchTransactions();
-    }
-  }
-
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
@@ -37,54 +18,19 @@ function App() {
     console.log(data);
   }
 
-  function handleInput(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  // function handleInput(e) {
+  //   setForm({ ...form, [e.target.name]: e.target.value });
+  // }
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          name="amount"
-          value={form.amount}
-          onChange={handleInput}
-          placeholder="Enter transaction amount"
-        />
-        <input
-          type="text"
-          name="description"
-          value={form.description}
-          onChange={handleInput}
-          placeholder="Enter transaction details"
-        />
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleInput}
-        />
-        <button type="submit">Submit</button>
-      </form>
+      <AppBar />
 
-      <section>
-        <table>
-          <thead>
-            <td>Amount</td>
-            <td>Description</td>
-            <td>Date</td>
-          </thead>
-          <tbody>
-            {transactions.map((trx) => (
-              <tr key={trx._id}>
-                <td>{trx.amount}</td>
-                <td>{trx.description}</td>
-                <td>{trx.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <Container>
+        <TransactionForm fetchTransactions={fetchTransactions} />
+
+        <TransactionsList transactions={transactions} />
+      </Container>
     </div>
   );
 }
