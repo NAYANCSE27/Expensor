@@ -18,4 +18,16 @@ router.post("/", async (req, res) => {
   res.json({ message: "Transaction received" });
 });
 
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  await Transaction.findByIdAndDelete(id);
+  res.json({ message: "Transaction deleted" });
+});
+
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  await Transaction.updateOne({ _id: id }, { $set: req.body });
+  res.json({ message: "Transaction updated" });
+});
+
 export default router;
