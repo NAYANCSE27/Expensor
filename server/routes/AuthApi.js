@@ -8,6 +8,10 @@ router.post("/register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   // TODO: Validate the data before we make a user
+  // User.map((user) => {
+  //   console.log(user);
+  // });
+
   const userExists = User.findOne({ email });
   if (userExists) {
     res.status(406).json({ message: "User already exists" });
@@ -26,7 +30,7 @@ router.post("/register", async (req, res) => {
     password: hashedPassword,
   });
   const savedUser = await user.save();
-  console.log(savedUser);
+  // console.log(savedUser);
   res.status(201).json({ message: "User created successfully" });
 });
 
