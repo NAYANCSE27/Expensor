@@ -46,7 +46,7 @@ export default function Register() {
       password: data.get("password"),
     };
 
-    console.log(form);
+    // console.log(form);
 
     const res = await fetch("http://localhost:4000/auth/register", {
       mode: "cors",

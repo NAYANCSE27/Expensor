@@ -8,29 +8,27 @@ router.post("/register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   // TODO: Validate the data before we make a user
-  // User.map((user) => {
-  //   console.log(user);
-  // });
+  const users = await User.find({});
 
-  const userExists = User.findOne({ email });
-  if (userExists) {
-    res.status(406).json({ message: "User already exists" });
-    return;
-  }
+  users.forEach((user) => {
+    if (user.email === email) {
+      res.status(406).json({ message: "User already exists" });
+      return;
+    }
+  });
 
   // Hash the password
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
-  console.log(hashedPassword);
 
-  const user = await User({
+  const user = new User({
     firstName,
     lastName,
     email,
     password: hashedPassword,
   });
-  const savedUser = await user.save();
-  // console.log(savedUser);
+
+  await user.save();
   res.status(201).json({ message: "User created successfully" });
 });
 
