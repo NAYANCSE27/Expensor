@@ -3,9 +3,7 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -36,6 +34,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const defaultTheme = createTheme();
 
 export default function Register() {
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -46,8 +46,6 @@ export default function Register() {
       password: data.get("password"),
     };
 
-    // console.log(form);
-
     const res = await fetch("http://localhost:4000/auth/register", {
       mode: "cors",
       method: "POST",
@@ -57,8 +55,15 @@ export default function Register() {
       },
     });
 
-    if(res.ok){
-      console.log("ok");
+    if (res.ok) {
+      window.alert("Registration successful!");
+      navigate("/");
+    } else {
+      window.alert("Registration failed! User already exists.");
+      //reload the same page using navigate
+      navigate("/register");
+      // reload using express.js
+      // window.location.reload();
     }
   };
 

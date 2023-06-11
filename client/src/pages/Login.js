@@ -8,10 +8,13 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 
 const defaultTheme = createTheme();
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -20,7 +23,7 @@ export default function Login() {
       password: data.get("password"),
     };
 
-    const res = await fetch("https://localhost:4000/auth/login", {
+    const res = await fetch("http://localhost:4000/auth/login", {
       mode: "cors",
       method: "POST",
       body: JSON.stringify(form),
@@ -30,7 +33,8 @@ export default function Login() {
     });
 
     if (res.ok) {
-      console.log("success");
+      window.alert("Login successful");
+      navigate("/");
     }
   };
 

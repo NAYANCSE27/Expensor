@@ -5,55 +5,74 @@ import jwt from "jsonwebtoken";
 const router = Router();
 
 router.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
-  // TODO: Validate the data before we make a user
-  const users = await User.find({});
-
-  users.forEach((user) => {
-    if (user.email === email) {
-      res.status(406).json({ message: "User already exists" });
-      return;
+  // always write a try..catch block for async/await or any endpoint
+  try {
+    // check that if the user already exists
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      throw new Error("User already exists");
     }
-  });
 
-  // Hash the password
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(password, salt);
+    // hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    req.body.password = hashedPassword;
 
-  const user = new User({
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-  });
-
-  await user.save();
-  res.status(201).json({ message: "User created successfully" });
+    // create new user
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.send({
+      success: true,
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
+// user login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const userExists = User.findOne({ email });
-  if (!userExists) {
-    res.status(404).json({ message: "User not found" });
-    return;
-  }
+  try {
+    // check if the user exists
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      throw new Error("User does not exist");
+    }
 
-  const matched = await bcrypt.compare(password, userExists.password);
-  if (!matched) {
-    res.status(401).json({ message: "Incorrect password" });
-    return;
-  }
+    // if user is active
+    if (user.status !== "active") {
+      throw new Error("The user account is blocked, please contact admin");
+    }
 
-  // TODO: Create and assign jwt token
-  const payload = {
-    _id: userExists._id,
-    username: userExists.email,
-  };
-  // console.log("payload" + payload);
-  const token = jwt.sign(payload, "some secret");
-  res.status(200).json({ message: "Logged in successfully", token });
+    // check if the password is correct
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (!validPassword) {
+      throw new Error("Invalid password");
+    }
+
+    // create and assign a token
+    const token = jwt.sign({ userId: user._id }, process.env.jwt_secret, {
+      expiresIn: "1d",
+    });
+
+    // send response
+    res.send({
+      success: true,
+      message: "User logged in successfully",
+      data: token,
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 export default router;
