@@ -57,7 +57,7 @@ export default function Register() {
 
     if (res.ok) {
       window.alert("Registration successful!");
-      navigate("/");
+      navigate("/login");
     } else {
       window.alert("Registration failed! User already exists.");
       //reload the same page using navigate
