@@ -18,6 +18,7 @@ app.use("/transaction", TransactionRouters);
 
 await connect();
 
+//connect to the port
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
